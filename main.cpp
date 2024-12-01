@@ -10,6 +10,7 @@ using namespace std;
 // Global variable that tracks # of comparisons made
 int comparisonCount = 0;
 
+// ------------Merge Sort Implementation ------------
 // Helper function to merge two sorted halves of the vector
 void merge(vector<int>* numbers, int left, int mid, int right) {
     int left_size = mid - left + 1;
@@ -85,6 +86,34 @@ void mergeSort(vector<int>* numbers, int left, int right) {
     }
 }
 
+// ------------ Quick Sort Implementation -------------
+
+// Function to partition the array for QuickSort
+int partition(vector<int>& arr, int low, int high) {
+    int pivot = arr[high];  // Choose the last element as pivot
+    int i = (low - 1);  // i is the index of the smaller element
+
+    for (int j = low; j < high; j++) {
+        comparisonCount++;  // Count comparison
+        if (arr[j] <= pivot) {  // If current element is smaller than or equal to pivot
+            i++;
+            swap(arr[i], arr[j]);  // Swap elements
+        }
+    }
+    swap(arr[i + 1], arr[high]);  // Swap the pivot into the correct position
+    return (i + 1);  // Return the partition index
+}
+
+// Function to perform QuickSort
+void quickSort(vector<int>& arr, int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);  // Partition the array
+        quickSort(arr, low, pi - 1);  // Recursively sort the left part
+        quickSort(arr, pi + 1, high);  // Recursively sort the right part
+    }
+}
+
+// ------------ File Handling Functions -----------
 
 // Reads data from file and stores in vector
 void readFile(const string& filename, vector<int>* numbers) {
@@ -156,6 +185,7 @@ int main() {
     int sorted_comparisons = comparisonCount;
     comparisonCount = 0;
 
+    // Sort and time the Reverse List using Quick Sort
     start = chrono::high_resolution_clock::now();
     mergeSort(&reverse, 0, reverse.size() - 1);
     end = chrono::high_resolution_clock::now();
@@ -163,6 +193,7 @@ int main() {
     int reverse_comparisons = comparisonCount;
     comparisonCount = 0;
 
+    // Sort and time the Random List using Merge Sort
     start = chrono::high_resolution_clock::now();
     mergeSort(&random, 0, random.size() - 1);
     end = chrono::high_resolution_clock::now();
