@@ -1,9 +1,9 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <vector>
 #include <string>
 #include <chrono>
+#include <array>
 
 using namespace std;
 
@@ -11,25 +11,25 @@ using namespace std;
 int comparisonCount = 0;
 
 // ------------Merge Sort Implementation ------------
-// Helper function to merge two sorted halves of the vector
-void merge(vector<int>* numbers, int left, int mid, int right) {
+// Helper function to merge two sorted halves of the array
+void merge(int* numbers, int left, int mid, int right) {
     int left_size = mid - left + 1;
     int right_size = right - mid;
 
     // Temporary arrays to hold halves
-    vector<int> left_half(left_size);
-    vector<int> right_half(right_size);
+    int* left_half = new int[left_size];
+    int* right_half = new int[right_size];
 
     // Copy data to temporary left array
     for (int i = 0; i < left_size; ++i) {
-        left_half[i] = (*numbers)[left + i];
+        left_half[i] = numbers[left + i];
     }
 
     // Copy data to temporary right array
     for (int i = 0; i < right_size; ++i) {
-        right_half[i] = (*numbers)[mid + 1 + i];
+        right_half[i] = numbers[mid + 1 + i];
     }
-        
+
     // Merges temporary arrays together as vector
 
     // Initial index of left half
@@ -43,13 +43,12 @@ void merge(vector<int>* numbers, int left, int mid, int right) {
 
     while (i < left_size && j < right_size) {
         comparisonCount++;
-
         if (left_half[i] <= right_half[j]) {
-            (*numbers)[k] = left_half[i];
+            numbers[k] = left_half[i];
             i++;
         }
         else {
-            (*numbers)[k] = right_half[j];
+            numbers[k] = right_half[j];
             j++;
         }
         k++;
@@ -57,22 +56,25 @@ void merge(vector<int>* numbers, int left, int mid, int right) {
 
     // Copy remaining elements of left_half
     while (i < left_size) {
-        (*numbers)[k] = left_half[i];
+        numbers[k] = left_half[i];
         i++;
         k++;
     }
 
     // Copy remaining elements of right_half
     while (j < right_size) {
-        (*numbers)[k] = right_half[j];
+        numbers[k] = right_half[j];
         j++;
         k++;
     }
+
+    // Free allocated memory
+    delete[] left_half;
+    delete[] right_half;
 }
 
-
-// Recursively sorts vector data using merge sort algorithm
-void mergeSort(vector<int>* numbers, int left, int right) {
+// Recursively sorts array data using merge sort algorithm
+void mergeSort(int* numbers, int left, int right) {
     if (left < right) {
         // Finds the middle point
         int mid = left + (right - left) / 2;
@@ -89,34 +91,65 @@ void mergeSort(vector<int>* numbers, int left, int right) {
 // ------------ Quick Sort Implementation -------------
 
 // Function to partition the array for QuickSort
-int partition(vector<int>& arr, int low, int high) {
-    int pivot = arr[high];  // Choose the last element as pivot
-    int i = (low - 1);  // i is the index of the smaller element
+int partition(int* arr, int low, int high) {
+    // Choose the last element as pivot
+    int pivot = arr[high];
+
+    // i is the index of the smaller element
+    int i = low - 1;
 
     for (int j = low; j < high; j++) {
-        comparisonCount++;  // Count comparison
-        if (arr[j] <= pivot) {  // If current element is smaller than or equal to pivot
+
+        comparisonCount++;
+
+        if (arr[j] <= pivot) {
             i++;
-            swap(arr[i], arr[j]);  // Swap elements
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
         }
     }
-    swap(arr[i + 1], arr[high]);  // Swap the pivot into the correct position
-    return (i + 1);  // Return the partition index
+
+    int temp = arr[i + 1];
+    arr[i + 1] = arr[high];
+    arr[high] = temp;
+
+    return i + 1;
 }
 
 // Function to perform QuickSort
-void quickSort(vector<int>& arr, int low, int high) {
-    if (low < high) {
-        int pi = partition(arr, low, high);  // Partition the array
-        quickSort(arr, low, pi - 1);  // Recursively sort the left part
-        quickSort(arr, pi + 1, high);  // Recursively sort the right part
+void quickSort(int* arr, int low, int high) {
+    int* stack = new int[high - low + 1];
+    int top = -1;
+
+    stack[++top] = low;
+    stack[++top] = high;
+
+    while (top >= 0) {
+        high = stack[top--];
+        low = stack[top--];
+
+        int pi = partition(arr, low, high);
+
+        if (pi - 1 > low) {
+            stack[++top] = low;
+            stack[++top] = pi - 1;
+        }
+
+        if (pi + 1 < high) {
+            stack[++top] = pi + 1;
+            stack[++top] = high;
+        }
     }
+
+    delete[] stack;
 }
+
 
 // ------------ File Handling Functions -----------
 
-// Reads data from file and stores in vector
-void readFile(const string& filename, vector<int>* numbers) {
+// Reads data from file and stores in array
+void readFile(const string& filename, int* numbers) {
 
     // Opens file
     ifstream inputFile(filename);
@@ -125,20 +158,19 @@ void readFile(const string& filename, vector<int>* numbers) {
         return;
     }
 
+    int index = 0;
+
     // Reads integers from file and stores them
-    int number;
-    while (inputFile >> number) {
-        numbers->push_back(number);
+    while (inputFile >> numbers[index] && index < 100000) {
+        index++;
     }
 
     // Close the file
     inputFile.close();
 }
 
-
-// Prints vector data to file
-void printData(const string& filename, const vector<int>* numbers) {
-
+// Prints array data to file
+void printData(const string& filename, const int* numbers) {
     // Opens output file
     ofstream outputFile(filename);
     if (!outputFile.is_open()) {
@@ -146,15 +178,14 @@ void printData(const string& filename, const vector<int>* numbers) {
         return;
     }
 
-    // Writes each vector entry to its own line
-    for (int i = 0; i < numbers->size(); ++i) {
-        outputFile << (*numbers)[i] << '\n';
+    // Writes each array entry to its own line
+    for (int i = 0; i < 100000; ++i) {
+        outputFile << numbers[i] << '\n';
     }
 
     // Close the file
     outputFile.close();
 }
-
 
 int main() {
     // Stores location of files to read
@@ -162,58 +193,123 @@ int main() {
     const string reverse_input = "files/reverse_numbers.txt";
     const string random_input = "files/random_numbers.txt";
 
+
     // Stores location of files to print data to
-    const string sorted_output = "files/sorted_numbers_output.txt";
-    const string reverse_output = "files/reverse_numbers_output.txt";
-    const string random_output = "files/random_numbers_output.txt";
+    const string merge_sorted_output = "files/merge_sorted_numbers_output.txt";
+    const string merge_reverse_output = "files/merge_reverse_numbers_output.txt";
+    const string merge_random_output = "files/merge_random_numbers_output.txt";
 
-    // Declares each vector
-    vector<int> sorted;
-    vector<int> reverse;
-    vector<int> random;
+    const string quick_sorted_output = "files/quick_sorted_numbers_output.txt";
+    const string quick_reverse_output = "files/quick_reverse_numbers_output.txt";
+    const string quick_random_output = "files/quick_random_numbers_output.txt";
 
-    // Reads each file to vector
-    readFile(sorted_input, &sorted);
-    readFile(reverse_input, &reverse);
-    readFile(random_input, &random);
 
-    // Sorts data of vectors, calculates elapsed sort time, and # of comparisons made
+    // Allocate arrays on the heap
+    int* sorted_merge = new int[100000];
+    int* reverse_merge = new int[100000];
+    int* random_merge = new int[100000];
+
+    int* sorted_quick = new int[100000];
+    int* reverse_quick = new int[100000];
+    int* random_quick = new int[100000];
+
+
+    // Reads each file into arrays
+    readFile(sorted_input, sorted_merge);
+    readFile(reverse_input, reverse_merge);
+    readFile(random_input, random_merge);
+
+    readFile(sorted_input, sorted_quick);
+    readFile(reverse_input, reverse_quick);
+    readFile(random_input, random_quick);
+
+    int size_of_array = 100000;
+
+
+    // Merge sorts data of vectors, calculates elapsed sort time, and # of comparisons made
     auto start = chrono::high_resolution_clock::now();
-    mergeSort(&sorted, 0, sorted.size() - 1);
+    mergeSort(sorted_merge, 0, size_of_array - 1);
     auto end = chrono::high_resolution_clock::now();
-    auto sorted_duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
-    int sorted_comparisons = comparisonCount;
+    auto merge_sorted_duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
+    int merge_sorted_comparisons = comparisonCount;
     comparisonCount = 0;
 
-    // Sort and time the Reverse List using Quick Sort
     start = chrono::high_resolution_clock::now();
-    mergeSort(&reverse, 0, reverse.size() - 1);
+    mergeSort(reverse_merge, 0, size_of_array - 1);
     end = chrono::high_resolution_clock::now();
-    auto reverse_duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
-    int reverse_comparisons = comparisonCount;
+    auto merge_reverse_duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
+    int merge_reverse_comparisons = comparisonCount;
     comparisonCount = 0;
 
-    // Sort and time the Random List using Merge Sort
     start = chrono::high_resolution_clock::now();
-    mergeSort(&random, 0, random.size() - 1);
+    mergeSort(random_merge, 0, size_of_array - 1);
     end = chrono::high_resolution_clock::now();
-    auto random_duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
-    int random_comparisons = comparisonCount;
+    auto merge_random_duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
+    int merge_random_comparisons = comparisonCount;
     comparisonCount = 0;
 
-    // Prints vector info to file
-    printData(sorted_output, &sorted);
-    printData(reverse_output, &reverse);
-    printData(random_output, &random);
 
-    cout << "Comparisons made in Sorted List: " << sorted_comparisons << endl;
-    cout << "Elapsed Time for Sorted List: " << sorted_duration << " microseconds" << endl;
+    // Quick sorts data of vectors, calculates elapsed sort time, and # of comparisons made
+    start = chrono::high_resolution_clock::now();
+    quickSort(sorted_quick, 0, size_of_array - 1);
+    end = chrono::high_resolution_clock::now();
+    auto quick_sorted_duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
+    int quick_sorted_comparisons = comparisonCount;
+    comparisonCount = 0;
 
-    cout << "Comparisons made in Reverse List: " << reverse_comparisons << endl;
-    cout << "Elapsed Time for Reverse List: " << reverse_duration << " microseconds" << endl;
+    start = chrono::high_resolution_clock::now();
+    quickSort(reverse_quick, 0, size_of_array - 1);
+    end = chrono::high_resolution_clock::now();
+    auto quick_reverse_duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
+    int quick_reverse_comparisons = comparisonCount;
+    comparisonCount = 0;
 
-    cout << "Comparisons made in Random List: " << random_comparisons << endl;
-    cout << "Elapsed Time for Random List: " << random_duration << " microseconds" << endl;
+    start = chrono::high_resolution_clock::now();
+    quickSort(random_quick, 0, size_of_array - 1);
+    end = chrono::high_resolution_clock::now();
+    auto quick_random_duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
+    int quick_random_comparisons = comparisonCount;
+    comparisonCount = 0;
+
+
+    // Prints arrays to files
+    printData(merge_sorted_output, sorted_merge);
+    printData(merge_reverse_output, reverse_merge);
+    printData(merge_random_output, random_merge);
+
+    printData(quick_sorted_output, sorted_quick);
+    printData(quick_reverse_output, reverse_quick);
+    printData(quick_random_output, random_quick);
+
+
+    // Prints comparison and duration info to console
+    cout << "Comparisons made in Sorted List: " << merge_sorted_comparisons << endl;
+    cout << "Elapsed Time for Sorted List: " << merge_sorted_duration << " microseconds" << endl;
+
+    cout << "Comparisons made in Reverse List: " << merge_reverse_comparisons << endl;
+    cout << "Elapsed Time for Reverse List: " << merge_reverse_duration << " microseconds" << endl;
+
+    cout << "Comparisons made in Random List: " << merge_random_comparisons << endl;
+    cout << "Elapsed Time for Random List: " << merge_random_duration << " microseconds" << endl;
+
+    cout << "Comparisons made in Sorted List: " << quick_sorted_comparisons << endl;
+    cout << "Elapsed Time for Sorted List: " << quick_sorted_duration << " microseconds" << endl;
+
+    cout << "Comparisons made in Reverse List: " << quick_reverse_comparisons << endl;
+    cout << "Elapsed Time for Reverse List: " << quick_reverse_duration << " microseconds" << endl;
+
+    cout << "Comparisons made in Random List: " << quick_random_comparisons << endl;
+    cout << "Elapsed Time for Random List: " << quick_random_duration << " microseconds" << endl;
+
+
+    // Deletes excess memory
+    delete[] sorted_merge;
+    delete[] reverse_merge;
+    delete[] random_merge;
+
+    delete[] sorted_quick;
+    delete[] reverse_quick;
+    delete[] random_quick;
 
     return 0;
 }
