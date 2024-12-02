@@ -283,24 +283,40 @@ int main() {
 
 
     // Prints comparison and duration info to console
-    cout << "Comparisons made in Sorted List: " << merge_sorted_comparisons << endl;
-    cout << "Elapsed Time for Sorted List: " << merge_sorted_duration << " microseconds" << endl;
+    // Merge Sort
+    cout << "-----------------------------------" << endl;
+    cout << endl;
+    cout << "** Merge Sort Results **" << endl;
+    cout << "Sorted List:\n";
+    cout << "# of Comparisons: " << merge_sorted_comparisons << endl;
+    cout << "Elapsed Time: " << merge_sorted_duration << " microseconds" << endl;
+    cout << endl;
+    cout << "Reverse List:\n";
+    cout << "# of Comparisons: " << merge_reverse_comparisons << endl;
+    cout << "Elapsed Time: " << merge_reverse_duration << " microseconds" << endl;
+    cout << endl;
+    cout << "Random List:\n";
+    cout << "# of Comparisons: " << merge_random_comparisons << endl;
+    cout << "Elapsed Time: " << merge_random_duration << " microseconds" << endl;
+    cout << endl;
+    cout << "-----------------------------------" << endl;
+    cout << endl;
 
-    cout << "Comparisons made in Reverse List: " << merge_reverse_comparisons << endl;
-    cout << "Elapsed Time for Reverse List: " << merge_reverse_duration << " microseconds" << endl;
-
-    cout << "Comparisons made in Random List: " << merge_random_comparisons << endl;
-    cout << "Elapsed Time for Random List: " << merge_random_duration << " microseconds" << endl;
-
-    cout << "Comparisons made in Sorted List: " << quick_sorted_comparisons << endl;
-    cout << "Elapsed Time for Sorted List: " << quick_sorted_duration << " microseconds" << endl;
-
-    cout << "Comparisons made in Reverse List: " << quick_reverse_comparisons << endl;
-    cout << "Elapsed Time for Reverse List: " << quick_reverse_duration << " microseconds" << endl;
-
-    cout << "Comparisons made in Random List: " << quick_random_comparisons << endl;
-    cout << "Elapsed Time for Random List: " << quick_random_duration << " microseconds" << endl;
-
+    // Quick Sort
+    cout << "** Quick Sort Results **" << endl;
+    cout << "Sorted List:\n";
+    cout << "# of Comparisons: " << quick_sorted_comparisons << endl;
+    cout << "Elapsed Time: " << quick_sorted_duration << " microseconds" << endl;
+    cout << endl;
+    cout << "Reverse List:\n";
+    cout << "# of Comparisons: " << quick_reverse_comparisons << endl;
+    cout << "Elapsed Time: " << quick_reverse_duration << " microseconds" << endl;
+    cout << endl;
+    cout << "Random List:\n";
+    cout << "# of Comparisons: " << quick_random_comparisons << endl;
+    cout << "Elapsed Time: " << quick_random_duration << " microseconds" << endl;
+    cout << endl;
+    cout << "-----------------------------------" << endl;
 
     // Deletes excess memory
     delete[] sorted_merge;
